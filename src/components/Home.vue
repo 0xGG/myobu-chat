@@ -164,6 +164,7 @@ export default {
       // get a list of peers
       const peers = await this.ipfs.swarm.peers();
       for (const i in peers) {
+        // console.log("peers: ", peers, i);
         // if we're already connected to the peer, don't bother doing a circuit connection
         if (peers[i].peer == peer) {
           return;

@@ -31,11 +31,15 @@ export default {
   mounted() {},
   computed: {
     chatChannel() {
-      return this.workspaceId + "-channel-" + this.selectedChannel;
+      return "global";
+      // return this.workspaceId + "-channel-" + this.selectedChannel;
     },
   },
   methods: {
     async onSendMarkdown(markdown) {
+      if (!this.ipfs) {
+        return;
+      }
       await this.ipfs.pubsub.publish(this.chatChannel, markdown);
       console.log("sendMarkdown; ", this.chatChannel, markdown);
     },
