@@ -6,7 +6,11 @@
       v-bind:connectionStatus="connectionStatus"
       v-bind:peers="peers"
     ></side-bar>
-    <chat-panel></chat-panel>
+    <chat-panel
+      v-bind:workspaceId="workspaceId"
+      v-bind:selectedChannel="selectedChannel"
+      v-bind:ipfs="ipfs"
+    ></chat-panel>
   </div>
 </template>
 
@@ -47,9 +51,6 @@ export default {
 
       // add bootstraps for next time, and attempt connection just in case we're not already connected
       await this.dobootstrap(false);
-
-      // join selected channel
-      await this.joinChannel(this.selectedChannel);
 
       // publish and subscribe to keepalive to help keep the sockets open
       const keepAliveChannel = this.workspaceId + "-keepalive";
@@ -200,19 +201,6 @@ export default {
         }
         await this.ipfs.swarm.connect(this.bootstraps[i]);
       }
-    },
-
-    async joinChannel(channel) {
-      await this.ipfs.pubsub.subscribe(
-        this.workspaceId + "-" + channel,
-        this.out
-      );
-    },
-
-    // out is used for processing recieved messages and outputting them both to console and the message box.
-    out(msg) {
-      msg = new TextDecoder().decode(msg.data);
-      console.log(msg);
     },
   },
 };

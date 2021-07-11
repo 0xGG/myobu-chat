@@ -17,7 +17,7 @@ export default {
 
 #chat-messages {
   width: 100%;
-  height: calc(100% - #{$text-box-height});
+  height: calc(100% - #{$text-box-height} - #{$chat-panel-top-bar-height});
   background-color: #fff;
 }
 </style>
