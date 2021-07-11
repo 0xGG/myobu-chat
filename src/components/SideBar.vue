@@ -1,18 +1,49 @@
 <template>
   <div id="side-bar">
     <h3>Myōbu Chat</h3>
-    <hr>
+    <!-- <p>{{workspaceId}}</p> -->
+    <hr />
     <p class="section-title"><strong>Channels</strong></p>
     <div class="channels">
       <div class="channel-btn"># general</div>
       <div class="channel-btn">+ Create/Join channel</div>
     </div>
+    <div class="status">
+      <div
+        v-bind:class="{
+          'status-ball': true,
+          relay: connectionStatus === 'RELAY',
+          'direct-peers': connectionStatus === 'DIRECT_PEERS',
+        }"
+        v-bind:title="
+          connectionStatus === 'RELAY'
+            ? 'Relay'
+            : connectionStatus === 'DIRECT_PEERS'
+            ? 'Direct Peers'
+            : 'No Peers'
+        "
+      >
+        ⬤
+      </div>
+      <div>{{ peers.size }} peer(s) online</div>
+    </div>
   </div>
 </template>
 
 <script>
+import Immutable from "immutable";
+
 export default {
   name: "SideBar",
+  props: {
+    workspaceId: String,
+    selectedChannel: String,
+    connectionStatus: String,
+    peers: Immutable.Set,
+  },
+  mounted() {
+    window.sidebar = this;
+  },
   data() {
     return {};
   },
@@ -59,9 +90,27 @@ h3 {
   width: 100%;
 
   &:hover {
-    background-color: darken($background-color, 4);
+    background-color: darken($background-color, 8);
     cursor: pointer;
   }
 }
 
+.status {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-top: 24px;
+}
+.status-ball {
+  color: #f44336;
+  margin-right: 12px;
+
+  &.relay {
+    color: lime;
+  }
+
+  &.direct-peers {
+    color: yellow;
+  }
+}
 </style>
