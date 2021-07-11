@@ -13,6 +13,8 @@ html,
 body {
   margin: 0;
   background-color: #f3f5f7;
+  width: 100%;
+  height: 100%;
 }
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
@@ -21,6 +23,8 @@ body {
   text-align: center;
   color: #2c3e50;
   background-color: #f3f5f7;
-  margin-top: 60px;
+  margin: 0;
+  width: 100%;
+  height: 100%;
 }
 </style>
