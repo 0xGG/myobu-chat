@@ -1,27 +1,29 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
-import Dashboard from "../components/Dashboard.vue";
+import Home from "../components/Home.vue";
 
 Vue.use(VueRouter);
 
 const routes = [
   {
     path: "/",
-    name: "Dashboard",
-    component: Dashboard,
-    meta: { title: "Myōbu | Dashboard" },
+    name: "Home",
+    component: Home,
+    meta: { title: "Myōbu | Chat" },
   },
+  /*
   {
     path: "/:walletAddress",
     name: "Dashboard",
     component: Dashboard,
-    meta: { title: "Myōbu | Dashboard" },
+    meta: { title: "Myōbu | Chat" },
   },
+  */
   {
     path: "*",
     name: "catchAll",
-    component: Dashboard,
-    meta: { title: "Myōbu | Dashboard" },
+    component: Home,
+    meta: { title: "Myōbu | Chat" },
   },
 ];
 
