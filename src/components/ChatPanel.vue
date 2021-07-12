@@ -3,13 +3,22 @@
     <div class="top-bar">
       <h4 class="channel-name"># {{ selectedChannel }}</h4>
     </div>
-    <chat-messages></chat-messages>
+    <div id="chat-messages" v-chat-scroll="{ always: false, smooth: true }">
+      <chat-message
+        v-for="message in messages"
+        v-bind:walletAddress="message.walletAddress"
+        v-bind:from="message.from"
+        v-bind:markdown="message.markdown"
+        v-bind:createdAt="message.createdAt"
+        v-bind:key="message.walletAddress + message.createdAt"
+      ></chat-message>
+    </div>
     <text-box v-on:send-markdown="onSendMarkdown"></text-box>
   </div>
 </template>
 
 <script>
-import ChatMessages from "./ChatMessages";
+import ChatMessage from "./ChatMessage";
 import TextBox from "./TextBox";
 
 export default {
@@ -20,7 +29,7 @@ export default {
     ipfs: Object,
   },
   components: {
-    ChatMessages,
+    ChatMessage,
     TextBox,
   },
   data() {
@@ -31,8 +40,7 @@ export default {
   mounted() {},
   computed: {
     chatChannel() {
-      return "global";
-      // return this.workspaceId + "-channel-" + this.selectedChannel;
+      return this.workspaceId + "-channel-" + this.selectedChannel;
     },
   },
   methods: {
@@ -40,8 +48,31 @@ export default {
       if (!this.ipfs) {
         return;
       }
-      await this.ipfs.pubsub.publish(this.chatChannel, markdown);
-      console.log("sendMarkdown; ", this.chatChannel, markdown);
+      const me = (await this.ipfs.id()).id;
+      await this.ipfs.pubsub.publish(
+        this.chatChannel,
+        JSON.stringify({
+          walletAddress: me, // TODO: Change walletAddress to wallet address
+          markdown,
+          createdAt: new Date(),
+        })
+      );
+    },
+    // receiveChatMessage is used for processing recieved messages and outputting them both to console and the message box.
+    receiveChatMessage(message) {
+      try {
+        const data = JSON.parse(new TextDecoder().decode(message.data));
+        const { walletAddress, markdown, createdAt } = data;
+        const chatMessage = {
+          walletAddress,
+          markdown,
+          from: message.from,
+          createdAt: createdAt,
+        };
+        this.messages.push(chatMessage);
+      } catch (error) {
+        console.error(error);
+      }
     },
   },
   watch: {
@@ -70,12 +101,6 @@ export default {
       );
       console.log("Subscribed to 1: ", this.chatChannel);
     },
-
-    // receiveChatMessage is used for processing recieved messages and outputting them both to console and the message box.
-    receiveChatMessage(message) {
-      const markdown = new TextDecoder().decode(message.data);
-      console.log("receiveChatMessage: ", message.from, markdown);
-    },
   },
 };
 </script>
@@ -100,6 +125,15 @@ export default {
 
   .channel-name {
     margin: 0;
+  }
+
+  #chat-messages {
+    width: 100%;
+    height: calc(100% - #{$text-box-height} - #{$chat-panel-top-bar-height});
+    background-color: #fff;
+    text-align: left;
+    padding: 8px;
+    overflow: auto;
   }
 }
 </style>
