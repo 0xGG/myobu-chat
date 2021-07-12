@@ -44,34 +44,17 @@
         id="markdown-input"
         rows="6"
         v-model="markdown"
+        placeholder="Write your chat message here"
       ></textarea>
     </div>
-    <div id="markdown-preview" v-html="html" v-else>{{ markdown }}</div>
+    <div class="preview text-box-markdown-preview" v-html="html" v-else>
+      {{ markdown }}
+    </div>
   </div>
 </template>
 
 <script>
-import MarkdownIt from "markdown-it";
-import MarkdownItEmoji from "markdown-it-emoji";
-import MarkdownItFootnote from "markdown-it-footnote";
-import MarkdownItIns from "markdown-it-ins";
-import MarkdownItMark from "markdown-it-mark";
-import MarkdownItSub from "markdown-it-sub";
-import MarkdownItSup from "markdown-it-sup";
-import MarkdownItTaskLists from "markdown-it-task-lists";
-const md = new MarkdownIt({
-  html: true,
-  linkify: true,
-  typographer: false, // The single quote will be rendered incorrectly, so disabled here.
-  breaks: true,
-});
-md.use(MarkdownItFootnote);
-md.use(MarkdownItTaskLists);
-md.use(MarkdownItMark);
-md.use(MarkdownItIns);
-md.use(MarkdownItSub);
-md.use(MarkdownItSup);
-md.use(MarkdownItEmoji);
+import md from "../lib/markdown";
 
 export default {
   name: "TextBox",
@@ -98,6 +81,7 @@ export default {
   height: $text-box-height;
   display: flex;
   flex-direction: column;
+  text-align: left;
 }
 
 #nav-tabs {
@@ -117,11 +101,10 @@ export default {
   resize: none;
 }
 
-#markdown-preview {
-  background-color: #fff;
-  flex: 1;
-  overflow: auto;
-  text-align: left;
-  padding: 4px;
+.text-box-markdown-preview {
+  height: 100%;
+  overflow: auto !important;
+  padding: 8px;
+  box-sizing: border-box !important;
 }
 </style>

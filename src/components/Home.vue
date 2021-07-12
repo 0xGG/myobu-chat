@@ -54,13 +54,15 @@ export default {
 
       // publish and subscribe to keepalive to help keep the sockets open
       const keepAliveChannel = this.workspaceId + "-keepalive";
-      await this.ipfs.pubsub.subscribe(keepAliveChannel);
+      await this.ipfs.pubsub.subscribe(keepAliveChannel, (/*msg*/) => {
+        // console.log("* keep-alive: ", msg.from);
+      });
       console.log(`Subscribed to ${keepAliveChannel} channel`);
       const keepAlive = async () => {
         await this.ipfs.pubsub.publish(keepAliveChannel, "1");
       };
       setInterval(keepAlive, 4000);
-      keepAlive();
+      await keepAlive();
       setInterval(this.checkAlive, 1000);
 
       // process announcements over the relay network, and publish our own keep-alives to keep the channel alive
@@ -118,11 +120,17 @@ export default {
     async processAnnounce(message) {
       // get our peerid
       const me = (await this.ipfs.id()).id;
-      // console.log("processAnnounce: ", message, me);
-      // console.log("processAnnouce data: ", data);
+      /*
+      console.log(
+        "processAnnounce: ",
+        message,
+        me,
+        new TextDecoder().decode(message.data)
+      );
+      */
 
       // not really an announcement if it's from us
-      if (message.from == me) {
+      if (message.from === me) {
         return;
       }
 
@@ -147,7 +155,7 @@ export default {
       // keep-alives are also sent over here, so let's update that global first
       this.lastAlive = new Date().getTime();
 
-      if (data == "keep-alive") {
+      if (data === "keep-alive") {
         // keep-alive is sent from circuit server
         // console.log(message.from, data);
         return;
@@ -157,7 +165,7 @@ export default {
       const swarmAddress = data;
       // console.log("Peer: " + peer);
       // console.log("Me: " + me);
-      if (peer == me) {
+      if (peer === me || !peer) {
         return;
       }
 
@@ -171,7 +179,7 @@ export default {
         }
       }
       // log the address to console as we're about to attempt a connection
-      // console.log(swarmAddress);
+      // console.log("Connect to swarm address:", swarmAddress);
 
       // connection almost always fails the first time, but almost always succeeds the second time, so we do this:
       try {
@@ -207,11 +215,25 @@ export default {
 };
 </script>
 
-<style scoped>
+<style lang="scss">
+
+@import "../assets/theme/preview_themes/github-light.scss";
+
 #home-panel {
   display: flex;
   flex-direction: row;
   width: 100%;
   height: 100%;
+
+  @media screen and (max-width: 576px) {
+    #side-bar {
+      display: none;
+      width: 100%;
+    }
+
+    #chat-panel {
+      width: 100%;
+    }
+  }
 }
 </style>
